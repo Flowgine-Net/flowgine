@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <PackageId>Flowgine.Meta</PackageId>
+        <Version>0.0.1</Version>
+        <Authors>Flowgine Team</Authors>
+        <PackageDescription>Meta package reserving the Flowgine.* prefix. See https://github.com/Flowgine/flowgine</PackageDescription>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/Flowgine/flowgine</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/Flowgine/flowgine</PackageProjectUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="" />
+    </ItemGroup>
+</Project>
