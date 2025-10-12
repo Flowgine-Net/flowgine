@@ -1,51 +1,24 @@
-﻿// See https://aka.ms/new-console-template for more information
-using Flowgine.Abstractions;
-using Flowgine.Core;
+﻿using Flowgine.Example.Console.Shared;
 
-Console.WriteLine("Hello, Flogine!");
-
-var entryNode = new MapNode();
-
-var flow = new Flowgine<TestState>()
-    .AddNode(entryNode)
-    .SetEntryPoint(entryNode.Name);
-
-var compiled = flow.Compile();
-
-await foreach (var ev in compiled.RunAsync(new TestState(10m), Guid.NewGuid()))
+// Reister new examples here
+var examples = new IExample[]
 {
-    switch (ev)
-    {
-        case NodeStarted<TestState> s:
-            Console.WriteLine($"→ START {s.NodeName}");
-            break;
+    new Flowgine.Example.Console.Examples._01_Basics.Run(),
+    new Flowgine.Example.Console.Examples._02_ConditionalFlow.Run(),
+    new Flowgine.Example.Console.Examples._03_LoopingFlow.Run(),
+};
 
-        case NodeCompleted<TestState> c:
-            Console.WriteLine($"✓ DONE  {c.NodeName}: Stage={c.State.X}");
-            break;
+var map = examples.ToDictionary(e => e.Id, e => e, StringComparer.OrdinalIgnoreCase);
 
-        case BranchTaken<TestState> b:
-            Console.WriteLine($"↪ BRANCH from {b.From} -> [{string.Join(", ", b.To)}]");
-            break;
+var exId = Cli.GetArg(args, "--example") ?? "03-looping";
 
-        case Interrupted<TestState> i:
-            Console.WriteLine($"! INTERRUPTED: {i.Reason}");
-            break;
-    }
+if (!map.TryGetValue(exId, out var example))
+{
+    System.Console.WriteLine("Available examples:");
+    foreach (var e in examples.OrderBy(e => e.Id))
+        System.Console.WriteLine($"  {e.Id,-14} {e.Title}");
+    System.Environment.Exit(1);
 }
 
-public record TestState(decimal X);
-
-public class MapNode : INode<TestState>
-{
-    public string Name => "MapNode";
-
-    public object? Invoke(TestState state, CancellationToken ct = default)
-    {
-        var next = state.X * (1 - state.X);
-        
-        // Silně typový partial update:
-        return Update.Of<TestState>()
-            .Set(s => s.X, next);
-    }
-}
+System.Console.WriteLine($"Running: {example.Id} - {example.Title}");
+await example.RunAsync();

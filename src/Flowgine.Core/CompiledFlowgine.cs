@@ -40,6 +40,19 @@ public sealed class CompiledFlowgine<TState>
         Name = name;
     }
 
+    public async Task<TState> RunToCompletionAsync(
+        TState initial,
+        Guid runId,
+        CancellationToken ct = default)
+    {
+        var final = initial;
+        await foreach (var ev in RunAsync(initial, runId, ct))
+            if (ev is NodeCompleted<TState> done)
+                final = done.State;
+
+        return final;
+    }
+
     /// <summary>
     /// Asynchronously executes the compiled flow and yields events describing the execution progress.
     /// </summary>

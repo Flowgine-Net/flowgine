@@ -6,11 +6,6 @@ namespace Flowgine.Abstractions;
 /// <typeparam name="TState">The type of state that is processed by the node.</typeparam>
 public interface INode<TState>
 {
-    /// <summary>
-    /// Gets the name of the node.
-    /// </summary>
-    string Name { get; }
-    
     object? Invoke(TState state,  CancellationToken ct = default);
     
     /// <summary>
