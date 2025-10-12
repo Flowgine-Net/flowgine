@@ -8,8 +8,6 @@ public readonly struct Partial<TState>
 
     public Partial() => _updates = new();
     
-    private Partial(List<(string Key, object? Value)> updates) => _updates = updates;
-    
     public Partial<TState> Set<TProp>(Expression<Func<TState, TProp>> selector, TProp value)
     {
         // vytáhni název property z expressionu
@@ -22,9 +20,6 @@ public readonly struct Partial<TState>
     }
     
     public IReadOnlyList<(string Key, object? Value)> ToTuples() => _updates;
-    
-    // pro pohodlí: implicitní převod na objekt, engine si to rozpozná
-    //public static implicit operator object?(Partial<TState> p) => p;
 }
 
 // Factory pro Partial<T>

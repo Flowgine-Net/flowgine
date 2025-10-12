@@ -1,5 +1,6 @@
 using Flowgine.Abstractions;
 using Flowgine.Abstractions.Helpers;
+using System.Collections.Generic;
 
 namespace Flowgine.Core;
 
@@ -32,9 +33,9 @@ public class Flowgine<TState>
             WarnCompiled("nodes");
         }
 
-        if (!_nodes.TryAdd(node.Name, node))
+        if (!_nodes.TryAdd(node.GetType().Name, node))
         {
-            throw new InvalidOperationException($"Node `{node.Name}` already present.");
+            throw new InvalidOperationException($"Node `{nameof(node)}` already present.");
         }
 
         return this;
@@ -48,7 +49,7 @@ public class Flowgine<TState>
     /// <returns>The current <see cref="Flowgine{TState}"/> instance for method chaining.</returns>
     /// <exception cref="InvalidOperationException">Thrown when the start or end node does not exist in the graph.</exception>
     public Flowgine<TState> AddEdge(string start, string end)
-    {
+     {
         if (_compiled)
         {
             WarnCompiled("edges");
@@ -65,39 +66,6 @@ public class Flowgine<TState>
         }
         
         _edges.Add((start, end));
-        
-        return this;
-    }
-    
-    /// <summary>
-    /// Adds conditional branching logic to a node, allowing dynamic path selection based on the current state.
-    /// </summary>
-    /// <param name="source">The name of the source node from which the conditional branches originate.</param>
-    /// <param name="path">A function that evaluates the current state and returns a collection of target node names.</param>
-    /// <param name="pathMap">Optional mapping from labels to node names for visualization purposes.</param>
-    /// <returns>The current <see cref="Flowgine{TState}"/> instance for method chaining.</returns>
-    /// <exception cref="InvalidOperationException">Thrown when the source node does not exist in the graph.</exception>
-    public Flowgine<TState> AddConditionalEdges(
-        string source,
-        Func<TState, CancellationToken, ValueTask<IReadOnlyCollection<string>>> path,
-        IReadOnlyDictionary<string, string>? pathMap = null)
-    {
-        if (_compiled)
-        {
-            WarnCompiled("edge");
-        }
-
-        if (!_nodes.ContainsKey(source))
-        {
-            throw new InvalidOperationException($"Need to AddNode `{source}` first");
-        }
-        
-        if (!_branches.TryGetValue(source, out var list))
-        {
-            list = new List<BranchSpec<TState>>();
-            _branches[source] = list;
-        }
-        list.Add(new BranchSpec<TState> { Path = path, PathMap = pathMap });
         
         return this;
     }
