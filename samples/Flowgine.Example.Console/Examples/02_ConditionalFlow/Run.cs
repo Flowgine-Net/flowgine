@@ -23,7 +23,7 @@ public class Run : IExample
 
         var state = new AgentState { Number1 = 5, Number2 = 2, Operation = "-" };
 
-        await foreach (var ev in compiled.RunAsync(state, Guid.NewGuid(), ct))
+        await foreach (var ev in compiled.RunAsync(state, Guid.NewGuid(), null, ct))
         {
             switch (ev)
             {

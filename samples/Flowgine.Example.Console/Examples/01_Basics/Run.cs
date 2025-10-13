@@ -20,7 +20,7 @@ public sealed class Run : IExample
 
         var state = new AgentState { X = 0.5m };
 
-        await foreach (var ev in compiled.RunAsync(state, Guid.NewGuid(), ct))
+        await foreach (var ev in compiled.RunAsync(state, Guid.NewGuid(), null, ct))
         {
             switch (ev)
             {

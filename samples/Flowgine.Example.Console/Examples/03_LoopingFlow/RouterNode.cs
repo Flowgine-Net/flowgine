@@ -5,7 +5,7 @@ namespace Flowgine.Example.Console.Examples._03_LoopingFlow;
 
 public class RouterNode : INode<AgentState>
 {
-    public object? Invoke(AgentState state, CancellationToken ct = default)
+    public object? Invoke(AgentState state, Runtime runtime, CancellationToken ct = default)
     {
         if (state.Counter < 5)
         {

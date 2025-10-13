@@ -9,6 +9,7 @@ namespace Flowgine.Example.Console.Examples._04_SimpleBot
 {
     public class AgentState
     {
-        public List<string> Messages { get; set; } = new();
+        public string Prompt { get; set; } = "Say 'hello from Flowgine'.";
+        public string LastAnswer { get; set; } = "";
     }
 }

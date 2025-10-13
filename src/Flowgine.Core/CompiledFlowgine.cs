@@ -1,4 +1,6 @@
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.DependencyInjection;
+
 using Flowgine.Abstractions;
 using Flowgine.Abstractions.Helpers;
 
@@ -43,10 +45,11 @@ public sealed class CompiledFlowgine<TState>
     public async Task<TState> RunToCompletionAsync(
         TState initial,
         Guid runId,
+        IServiceProvider? services = null,
         CancellationToken ct = default)
     {
         var final = initial;
-        await foreach (var ev in RunAsync(initial, runId, ct))
+        await foreach (var ev in RunAsync(initial, runId, services, ct))
             if (ev is NodeCompleted<TState> done)
                 final = done.State;
 
@@ -62,72 +65,91 @@ public sealed class CompiledFlowgine<TState>
     /// <returns>An async enumerable of flow events that describe the execution progress.</returns>
     public async IAsyncEnumerable<FlowgineEvent<TState>> RunAsync(
         TState initialState, 
-        Guid runId, 
+        Guid runId,
+        IServiceProvider? services = null,
         [EnumeratorCancellation] CancellationToken ct = default)
     {
         // Load checkpoint if available
         var state = _checkpoints is null 
             ? initialState : await _checkpoints.LoadAsync(runId, ct) ?? initialState;
         
-        // Find the starting node
-        var next = _builder.Edges.FirstOrDefault(e => e.From == FlowgineEdge.START).To;
-        if (string.IsNullOrEmpty(next)) yield break;
+        IServiceScope? scope = null;
+        IServiceProvider sp = services ?? EmptyServiceProvider.Instance;
 
-        while (true)
+        if (sp.GetService(typeof(IServiceScopeFactory)) is IServiceScopeFactory sf)
         {
-            ct.ThrowIfCancellationRequested();
-            
-            yield return new NodeStarted<TState>(next);
-            
-            var node = _builder.Nodes[next];
-            var result = await node.InvokeAsync(state, ct);
-            
-            // Normalize node output
-            var (updates, commands) = NormalizeNodeResult(result);
+            scope = sf.CreateScope();
+        }
 
-            if (updates.Count > 0)
+        try
+        {
+            var runSp = scope?.ServiceProvider ?? sp;
+            var runtime = new Runtime(runId, runSp);
+            
+            // Find the starting node
+            var next = _builder.Edges.FirstOrDefault(e => e.From == FlowgineEdge.START).To;
+            if (string.IsNullOrEmpty(next)) yield break;
+            
+            while (true)
             {
-                state = ApplyUpdates(state, updates);
-                if (_checkpoints is not null)
-                    await _checkpoints.SaveAsync(runId, state, ct);
-            }
-            
-            yield return new NodeCompleted<TState>(next, state);
-            
-            // Step 3: Extract target nodes from Commands (goto)
-            var gotoTargets = commands.SelectMany(c => c.Goto).ToList();
-            
-            // Step 4: If no Commands exist, try explicit edges/branch logic
-            if (gotoTargets.Count == 0)
-            {
-                // Check if there's a branch specification for the current node
-                if (_builder.Branches.TryGetValue(next, out var branchSpecs) && branchSpecs.Count > 0)
+                ct.ThrowIfCancellationRequested();
+                
+                yield return new NodeStarted<TState>(next);
+                
+                var node = _builder.Nodes[next];
+                var result = await node.InvokeAsync(state, runtime, ct);
+                
+                // Normalize node output
+                var (updates, commands) = NormalizeNodeResult(result);
+
+                if (updates.Count > 0)
                 {
-                    var acc = new List<string>(4);
-                    foreach (var br in branchSpecs)
-                    {
-                        var chosen = await br.Path(state, ct);
-                        if (chosen is { Count: > 0 }) acc.AddRange(chosen);
-                    }
-                    gotoTargets = acc;
+                    state = ApplyUpdates(state, updates);
+                    if (_checkpoints is not null)
+                        await _checkpoints.SaveAsync(runId, state, ct);
                 }
-                // If branch logic didn't determine anything, use classic edge next->X (if it exists)
+                
+                yield return new NodeCompleted<TState>(next, state);
+                
+                // Step 3: Extract target nodes from Commands (goto)
+                var gotoTargets = commands.SelectMany(c => c.Goto).ToList();
+                
+                // Step 4: If no Commands exist, try explicit edges/branch logic
                 if (gotoTargets.Count == 0)
                 {
-                    var edge = _builder.Edges.FirstOrDefault(e => e.From.Equals(next, StringComparison.OrdinalIgnoreCase));
-                    if (!string.IsNullOrEmpty(edge.To)) gotoTargets.Add(edge.To);
+                    // Check if there's a branch specification for the current node
+                    if (_builder.Branches.TryGetValue(next, out var branchSpecs) && branchSpecs.Count > 0)
+                    {
+                        var acc = new List<string>(4);
+                        foreach (var br in branchSpecs)
+                        {
+                            var chosen = await br.Path(state, ct);
+                            if (chosen is { Count: > 0 }) acc.AddRange(chosen);
+                        }
+                        gotoTargets = acc;
+                    }
+                    // If branch logic didn't determine anything, use classic edge next->X (if it exists)
+                    if (gotoTargets.Count == 0)
+                    {
+                        var edge = _builder.Edges.FirstOrDefault(e => e.From.Equals(next, StringComparison.OrdinalIgnoreCase));
+                        if (!string.IsNullOrEmpty(edge.To)) gotoTargets.Add(edge.To);
+                    }
                 }
+                
+                // Signal the chosen branches
+                if (gotoTargets.Count > 0)
+                    yield return new BranchTaken<TState>(next, gotoTargets);
+
+                // Step 5: Select the next node based on gotoTargets (ignore END; if everything is END → finish)
+                var firstNext = gotoTargets.FirstOrDefault(t => t != FlowgineEdge.END);
+                if (string.IsNullOrEmpty(firstNext)) yield break;
+
+                next = firstNext;
             }
-            
-            // Signal the chosen branches
-            if (gotoTargets.Count > 0)
-                yield return new BranchTaken<TState>(next, gotoTargets);
-
-            // Step 5: Select the next node based on gotoTargets (ignore END; if everything is END → finish)
-            var firstNext = gotoTargets.FirstOrDefault(t => t != FlowgineEdge.END);
-            if (string.IsNullOrEmpty(firstNext)) yield break;
-
-            next = firstNext;
+        }
+        finally
+        {
+            scope?.Dispose();
         }
     }
 

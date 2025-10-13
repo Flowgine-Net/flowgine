@@ -4,7 +4,7 @@ namespace Flowgine.Example.Console.Examples._02_ConditionalFlow;
 
 public class RouterNode : INode<AgentState>
 {
-    public object? Invoke(AgentState state, CancellationToken ct = default)
+    public object? Invoke(AgentState state, Runtime runtime, CancellationToken ct = default)
     {
         if (state.Operation == "+")
         {
