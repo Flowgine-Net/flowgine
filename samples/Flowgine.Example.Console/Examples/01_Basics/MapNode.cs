@@ -4,7 +4,7 @@ namespace Flowgine.Example.Console.Examples._01_Basics;
 
 public class MapNode : INode<AgentState>
 {
-    public object? Invoke(AgentState state, CancellationToken ct = default)
+    public object? Invoke(AgentState state, Runtime runtime, CancellationToken ct = default)
     {
         var newValue = state.X * (1 - state.X);
 

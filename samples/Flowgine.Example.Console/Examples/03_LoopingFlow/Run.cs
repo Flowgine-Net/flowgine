@@ -23,11 +23,11 @@ public class Run : IExample
 
         var state = new AgentState() { Name = "Flowgine", Counter = 0 };
 
-        var final = await compiled.RunToCompletionAsync(state, Guid.NewGuid(), ct);
+        var final = await compiled.RunToCompletionAsync(state, Guid.NewGuid(),null, ct);
 
         foreach(var number in final.Numbers)
         {
             System.Console.WriteLine($"Generated number: {number}");
-        }
-     }
+        } 
+    }
 }
