@@ -14,9 +14,10 @@ public class Run : IExample
         var flow = new Flowgine<AgentState>()
             .AddNode(new ReflectionNode())
             .AddNode(new GenerationNode())
+            .AddNode(new RouterNode())
             .SetEntryPoint(nameof(GenerationNode))
-            .SetFinishPoint(nameof(ReflectionNode))
-            .AddEdge(nameof(GenerationNode), nameof(ReflectionNode));
+            .AddEdge(nameof(GenerationNode), nameof(RouterNode))
+            .AddEdge(nameof(ReflectionNode), nameof(GenerationNode));
         
         var compiledFlow = flow.Compile();
         
