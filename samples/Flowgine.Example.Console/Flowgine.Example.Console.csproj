@@ -27,6 +27,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <UserSecretsId>fb9a154e-5237-44b7-9588-00e20188bd95</UserSecretsId>
   </PropertyGroup>
 
 </Project>

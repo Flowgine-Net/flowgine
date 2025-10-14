@@ -62,3 +62,6 @@ nunit-*.xml
 
 # Apple
 .DS_Store
+
+# Development
+appsettings.Development.json
