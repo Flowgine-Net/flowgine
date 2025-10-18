@@ -9,10 +9,11 @@ public class Run: IExample
     public string Title => "SimpleBot - How to integrate LLMs in our flows";
     public async Task RunAsync(CancellationToken ct = default)
     {
-        var flow = new Flowgine<AgentState>()
-            .AddNode(new AskNode())
-            .SetEntryPoint(nameof(AskNode))
-            .SetFinishPoint(nameof(AskNode));
+        var flow = new Flowgine<AgentState>();
+        var ask = flow.AddNode(new AskNode());
+        
+        flow.SetEntryPoint(ask)
+            .SetFinishPoint(ask);
         
         var compiledFlow = flow.Compile();
         

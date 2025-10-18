@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Flowgine.Core\Flowgine.Core.csproj" />
-    <ProjectReference Include="..\..\src\Flowgine.Abstractions\Flowgine.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\Flowgine\Flowgine.csproj" />
     <ProjectReference Include="..\..\src\Flowgine.LLM.OpenAI\Flowgine.LLM.OpenAI.csproj" />
   </ItemGroup>
 
