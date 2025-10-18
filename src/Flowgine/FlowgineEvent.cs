@@ -22,6 +22,15 @@ public sealed record NodeStarted<TState>(string NodeName) : FlowgineEvent<TState
 public sealed record NodeCompleted<TState>(string NodeName, TState State) : FlowgineEvent<TState>;
 
 /// <summary>
+/// Represents an event that indicates a node execution has failed with an exception.
+/// </summary>
+/// <typeparam name="TState">The type of state associated with the flow operation.</typeparam>
+/// <param name="NodeName">The name of the node that failed.</param>
+/// <param name="State">The state at the time of failure.</param>
+/// <param name="Error">The exception that caused the failure.</param>
+public sealed record NodeFailed<TState>(string NodeName, TState State, Exception Error) : FlowgineEvent<TState>;
+
+/// <summary>
 /// Represents an event that indicates a branch transition within a flow execution, capturing the originating node and the potential destination nodes.
 /// </summary>
 /// <typeparam name="TState">The type of state associated with the flow operation.</typeparam>

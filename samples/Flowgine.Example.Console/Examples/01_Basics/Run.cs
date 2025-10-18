@@ -11,10 +11,11 @@ public sealed class Run : IExample
 
     public async Task RunAsync(CancellationToken ct = default)
     {
-        var flow = new Flowgine<AgentState>()
-            .AddNode(new MapNode())
-            .SetEntryPoint(nameof(MapNode))
-            .SetFinishPoint(nameof(MapNode));
+        var flow = new Flowgine<AgentState>();
+        var map = flow.AddNode(new MapNode());
+        
+        flow.SetEntryPoint(map)
+            .SetFinishPoint(map);
 
         var compiled = flow.Compile();
 

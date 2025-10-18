@@ -11,13 +11,15 @@ public class Run : IExample
 
     public async Task RunAsync(CancellationToken ct = default)
     {
-        var flow = new Flowgine<AgentState>()
-            .AddNode(new GreetingNode())
-            .AddNode(new RandomNode())
-            .AddNode(new RouterNode())
-            .SetEntryPoint(nameof(GreetingNode))
-            .AddEdge(nameof(GreetingNode), nameof(RandomNode))
-            .AddEdge(nameof(RandomNode), nameof(RouterNode));
+        var flow = new Flowgine<AgentState>();
+        
+        var greeting = flow.AddNode(new GreetingNode());
+        var random = flow.AddNode(new RandomNode());
+        var router = flow.AddNode(new RouterNode(random));
+        
+        flow.SetEntryPoint(greeting)
+            .AddEdge(greeting, random)
+            .AddEdge(random, router);
 
         var compiled = flow.Compile();
 
