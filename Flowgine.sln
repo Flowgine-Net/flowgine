@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flowgine.Example.Console", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flowgine.LLM.OpenAI", "src\Flowgine.LLM.OpenAI\Flowgine.LLM.OpenAI.csproj", "{EB43A22F-AE0A-40E7-A0C5-002AD302E896}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flowgine.LLM.Abstractions", "src\Flowgine.LLM.Abstractions\Flowgine.LLM.Abstractions.csproj", "{6CFBB9AA-8043-416A-A4BC-41987002C54D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flowgine.LLM", "src\Flowgine.LLM\Flowgine.LLM.csproj", "{6CFBB9AA-8043-416A-A4BC-41987002C54D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

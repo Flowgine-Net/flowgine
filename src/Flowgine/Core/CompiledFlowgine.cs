@@ -48,20 +48,46 @@ public sealed class CompiledFlowgine<TState>
 
     /// <summary>
     /// Executes the flow to completion and returns the final state.
+    /// A unique run ID is automatically generated.
     /// </summary>
     /// <param name="initial">The initial state to start execution with.</param>
-    /// <param name="runId">A unique identifier for this specific flow run.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The final state after flow completion.</returns>
+    public Task<TState> RunToCompletionAsync(
+        TState initial,
+        CancellationToken ct = default)
+        => RunToCompletionAsync(initial, services: null, Guid.NewGuid(), ct);
+
+    /// <summary>
+    /// Executes the flow to completion and returns the final state.
+    /// A unique run ID is automatically generated.
+    /// </summary>
+    /// <param name="initial">The initial state to start execution with.</param>
     /// <param name="services">Optional service provider for dependency injection.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The final state after flow completion.</returns>
+    public Task<TState> RunToCompletionAsync(
+        TState initial,
+        IServiceProvider? services,
+        CancellationToken ct = default)
+        => RunToCompletionAsync(initial, services, Guid.NewGuid(), ct);
+
+    /// <summary>
+    /// Executes the flow to completion and returns the final state.
+    /// </summary>
+    /// <param name="initial">The initial state to start execution with.</param>
+    /// <param name="services">Optional service provider for dependency injection.</param>
+    /// <param name="runId">A unique identifier for this specific flow run, used for checkpointing.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The final state after flow completion.</returns>
     public async Task<TState> RunToCompletionAsync(
         TState initial,
+        IServiceProvider? services,
         Guid runId,
-        IServiceProvider? services = null,
         CancellationToken ct = default)
     {
         var final = initial;
-        await foreach (var ev in RunAsync(initial, runId, services, ct))
+        await foreach (var ev in RunAsync(initial, services, runId, ct))
             if (ev is NodeCompleted<TState> done)
                 final = done.State;
 
@@ -70,16 +96,42 @@ public sealed class CompiledFlowgine<TState>
 
     /// <summary>
     /// Asynchronously executes the compiled flow and yields events describing the execution progress.
+    /// A unique run ID is automatically generated.
     /// </summary>
     /// <param name="initialState">The initial state to start the flow execution with.</param>
-    /// <param name="runId">A unique identifier for this specific flow run, used for checkpointing.</param>
+    /// <param name="ct">A cancellation token to observe while waiting for the task to complete.</param>
+    /// <returns>An async enumerable of flow events that describe the execution progress.</returns>
+    public IAsyncEnumerable<FlowgineEvent<TState>> RunAsync(
+        TState initialState,
+        CancellationToken ct = default)
+        => RunAsync(initialState, services: null, Guid.NewGuid(), ct);
+
+    /// <summary>
+    /// Asynchronously executes the compiled flow and yields events describing the execution progress.
+    /// A unique run ID is automatically generated.
+    /// </summary>
+    /// <param name="initialState">The initial state to start the flow execution with.</param>
     /// <param name="services">Optional service provider for dependency injection in nodes.</param>
     /// <param name="ct">A cancellation token to observe while waiting for the task to complete.</param>
     /// <returns>An async enumerable of flow events that describe the execution progress.</returns>
+    public IAsyncEnumerable<FlowgineEvent<TState>> RunAsync(
+        TState initialState,
+        IServiceProvider? services,
+        CancellationToken ct = default)
+        => RunAsync(initialState, services, Guid.NewGuid(), ct);
+
+    /// <summary>
+    /// Asynchronously executes the compiled flow and yields events describing the execution progress.
+    /// </summary>
+    /// <param name="initialState">The initial state to start the flow execution with.</param>
+    /// <param name="services">Optional service provider for dependency injection in nodes.</param>
+    /// <param name="runId">A unique identifier for this specific flow run, used for checkpointing and tracing.</param>
+    /// <param name="ct">A cancellation token to observe while waiting for the task to complete.</param>
+    /// <returns>An async enumerable of flow events that describe the execution progress.</returns>
     public async IAsyncEnumerable<FlowgineEvent<TState>> RunAsync(
-        TState initialState, 
+        TState initialState,
+        IServiceProvider? services,
         Guid runId,
-        IServiceProvider? services = null,
         [EnumeratorCancellation] CancellationToken ct = default)
     {
         // Load checkpoint if available
@@ -175,6 +227,15 @@ public sealed class CompiledFlowgine<TState>
                 var firstNext = gotoTargets.FirstOrDefault(t => t != "__end__");
                 if (string.IsNullOrEmpty(firstNext)) 
                     yield break;
+
+                // Validate that the target node exists before continuing
+                if (!_builder.Nodes.ContainsKey(firstNext))
+                {
+                    var availableNodes = string.Join(", ", _builder.Nodes.Keys);
+                    throw new InvalidOperationException(
+                        $"Node '{next}' attempted to navigate to unknown node '{firstNext}'. " +
+                        $"Available nodes: {availableNodes}");
+                }
 
                 next = firstNext;
             }
@@ -300,6 +361,8 @@ public sealed class CompiledFlowgine<TState>
         var ctors = type.GetConstructors()
             .OrderByDescending(c => c.GetParameters().Length)
             .ToList();
+
+        List<Exception>? constructorErrors = null;
             
         foreach (var ctor in ctors)
         {
@@ -346,15 +409,37 @@ public sealed class CompiledFlowgine<TState>
                 {
                     return (TState)ctor.Invoke(args);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // Try next constructor
-                    continue;
+                    // Collect errors for reporting
+                    constructorErrors ??= new List<Exception>();
+                    constructorErrors.Add(ex);
                 }
             }
         }
         
-        // If nothing worked, return current
+        // If we tried constructors but all failed, throw detailed error
+        if (constructorErrors != null && constructorErrors.Count > 0)
+        {
+            var errorDetails = string.Join("; ", constructorErrors.Select(e => e.Message));
+            throw new InvalidOperationException(
+                $"Failed to update immutable type '{type.Name}'. " +
+                $"Tried {constructorErrors.Count} constructor(s) but all failed. " +
+                $"Updates: {string.Join(", ", dict.Keys)}. " +
+                $"Errors: {errorDetails}", 
+                constructorErrors[0]);
+        }
+        
+        // If we have updates but no way to apply them, warn
+        if (dict.Count > 0)
+        {
+            throw new InvalidOperationException(
+                $"Cannot apply updates to type '{type.Name}'. " +
+                $"Type has no writable properties and no suitable constructor found. " +
+                $"Attempted updates: {string.Join(", ", dict.Keys)}.");
+        }
+        
+        // No updates to apply - return current unchanged
         return current;
     }
 }

@@ -19,6 +19,6 @@ public class Run: IExample
         
         var state = new AgentState { Prompt = "Write a 3-word greeting." };
         
-        var final = await compiledFlow.RunToCompletionAsync(state, Guid.NewGuid(),Program.Services!, ct);
+        var final = await compiledFlow.RunToCompletionAsync(state, Program.Services!, ct);
     }
 }

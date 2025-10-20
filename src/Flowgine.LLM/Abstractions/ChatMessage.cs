@@ -14,3 +14,4 @@ public sealed record ChatMessage(ChatRole Role, IReadOnlyList<ChatContent> Parts
     public static ChatMessage User(string t)     => new(ChatRole.User, [new TextContent(t)]);
     public static ChatMessage Assistant(string t)=> new(ChatRole.Assistant, [new TextContent(t)]);
 }
+
