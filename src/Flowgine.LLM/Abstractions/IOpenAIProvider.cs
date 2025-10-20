@@ -20,3 +20,4 @@ public interface IOpenAIProvider
     /// <exception cref="ArgumentException">Thrown when <paramref name="model"/> is null or whitespace.</exception>
     IChatModel GetModel(string model);
 }
+

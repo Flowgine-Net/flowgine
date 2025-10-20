@@ -5,3 +5,4 @@ public sealed record ChatRequest(
     float? Temperature = null,
     int? MaxTokens = null,
     IReadOnlyDictionary<string, object?>? Tools = null);
+
