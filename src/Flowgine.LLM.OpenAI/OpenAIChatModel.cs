@@ -124,10 +124,35 @@ public sealed class OpenAIChatModel : IChatModel
             // 4. Process finish reason (end of stream)
             if (update.FinishReason.HasValue)
             {
-                // Build final completion
+                // Build message content parts
+                var parts = new List<ChatContent>();
+                
+                // Add text content if present
+                var txt = contentBuilder.ToString();
+                if (!string.IsNullOrEmpty(txt))
+                {
+                    parts.Add(new TextContent(txt));
+                }
+                
+                // Add tool calls as content parts
+                foreach (var acc in toolCallsBuilder.Values)
+                {
+                    parts.Add(new ToolCallContent(
+                        acc.Name,
+                        acc.ArgumentsBuilder.ToString(),
+                        acc.Id
+                    ));
+                }
+                
+                // If no parts, add empty text content
+                if (parts.Count == 0)
+                {
+                    parts.Add(new TextContent(""));
+                }
+                
                 var message = new Flowgine.LLM.Abstractions.ChatMessage(
                     ChatRole.Assistant,
-                    [new TextContent(contentBuilder.ToString())]
+                    parts
                 );
                 
                 var toolCalls = toolCallsBuilder.Values
@@ -253,15 +278,41 @@ public sealed class OpenAIChatModel : IChatModel
                     }
                 }
             }
+            else if (m.Role == ChatRole.Assistant)
+            {
+                // Handle assistant messages with potential tool calls
+                var text = string.Join("", m.Parts.OfType<TextContent>().Select(p => p.Text));
+                var toolCallParts = m.Parts.OfType<ToolCallContent>().ToList();
+                
+                if (toolCallParts.Count > 0)
+                {
+                    // Create assistant message with tool calls
+                    var toolCalls = toolCallParts.Select(tc =>
+                        ChatToolCall.CreateFunctionToolCall(tc.Id, tc.Name, BinaryData.FromString(tc.ArgumentsJson))
+                    ).ToList();
+                    
+                    // Create assistant message with both content and tool calls
+                    var message = new AssistantChatMessage(toolCalls);
+                    if (!string.IsNullOrEmpty(text))
+                    {
+                        message.Content.Add(ChatMessageContentPart.CreateTextPart(text));
+                    }
+                    yield return message;
+                }
+                else
+                {
+                    // Regular assistant message without tool calls
+                    yield return ChatMessage.CreateAssistantMessage(text);
+                }
+            }
             else
             {
-                // Handle regular messages
+                // Handle other message types (System, User)
                 var text = string.Join("", m.Parts.OfType<TextContent>().Select(p => p.Text));
                 yield return m.Role switch
                 {
                     ChatRole.System    => ChatMessage.CreateSystemMessage(text),
                     ChatRole.User      => ChatMessage.CreateUserMessage(text),
-                    ChatRole.Assistant => ChatMessage.CreateAssistantMessage(text),
                     _ => ChatMessage.CreateUserMessage(text),
                 };
             }
@@ -270,9 +321,37 @@ public sealed class OpenAIChatModel : IChatModel
     
     private static Flowgine.LLM.Abstractions.ChatCompletion FromOpenAI(ChatCompletion completion)
     {
+        // Build message content parts
+        var parts = new List<ChatContent>();
+        
+        // Add text content if present
         var txt = completion.Content?.FirstOrDefault()?.Text ?? "";
+        if (!string.IsNullOrEmpty(txt))
+        {
+            parts.Add(new TextContent(txt));
+        }
+        
+        // Add tool calls as content parts
+        if (completion.ToolCalls != null)
+        {
+            foreach (var tc in completion.ToolCalls)
+            {
+                parts.Add(new ToolCallContent(
+                    tc.FunctionName,
+                    tc.FunctionArguments.ToString(),
+                    tc.Id
+                ));
+            }
+        }
+        
+        // If no parts, add empty text content
+        if (parts.Count == 0)
+        {
+            parts.Add(new TextContent(""));
+        }
+        
         var message = new Flowgine.LLM.Abstractions.ChatMessage(
-            ChatRole.Assistant, [new TextContent(txt)]);
+            ChatRole.Assistant, parts);
 
         var tools = completion.ToolCalls?.Select(tc =>
             new ToolCall(tc.FunctionName, tc.FunctionArguments.ToString(), tc.Id)).ToArray() ?? [];

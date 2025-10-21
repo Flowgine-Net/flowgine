@@ -4,5 +4,5 @@ namespace Flowgine.Example.Console.Examples._05_ReflectionAgent;
 
 public class AgentState
 {
-    public List<ChatMessage> Messages = new();
+    public List<ChatMessage> Messages { get; set; } = new();
 }

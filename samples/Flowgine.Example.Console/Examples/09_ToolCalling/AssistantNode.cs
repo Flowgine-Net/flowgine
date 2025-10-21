@@ -96,10 +96,10 @@ public sealed class AssistantNode : AsyncNode<AgentState>
         // Call LLM
         var completion = await llm.GenerateAsync(request, ct);
         
-        // Add assistant response to history
+        // Add assistant response to history (preserve tool_calls if present)
         var updatedMessages = new List<ChatMessage>(state.Messages) 
         { 
-            completion.Message 
+            completion.Message
         };
         
         // Check if LLM wants to call tools

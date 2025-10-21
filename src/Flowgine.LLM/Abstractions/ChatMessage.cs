@@ -38,6 +38,14 @@ public abstract record ChatContent;
 public sealed record TextContent(string Text) : ChatContent;
 
 /// <summary>
+/// Represents a tool/function call request from the assistant.
+/// </summary>
+/// <param name="Name">The name of the tool to call.</param>
+/// <param name="ArgumentsJson">The arguments as a JSON string.</param>
+/// <param name="Id">Unique identifier for this tool call.</param>
+public sealed record ToolCallContent(string Name, string ArgumentsJson, string Id) : ChatContent;
+
+/// <summary>
 /// Represents the result of a tool/function call.
 /// Used in tool messages to provide execution results back to the model.
 /// </summary>

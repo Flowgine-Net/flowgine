@@ -13,7 +13,7 @@ public class RouterNode : INode<AgentState>
     
     public object? Invoke(AgentState state, Runtime runtime, CancellationToken ct = default)
     {
-        if (state.Messages.Count > 6)
+        if (state.Messages.Count > 5)
         {
             return Command.Goto(FlowBoundary<AgentState>.End);
         }
