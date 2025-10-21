@@ -1,11 +1,11 @@
 using Flowgine.Example.Console.Shared;
 using Flowgine.Core;
 
-namespace Flowgine.Example.Console.Examples._08_StreamingBot;
+namespace Flowgine.Example.Console.Examples._06_StreamingBot;
 
 public class Run : IExample
 {
-    public string Id => "08-streaming-bot";
+    public string Id => "06-streaming-bot";
     public string Title => "StreamingBot - Real-time token-by-token LLM responses";
 
     public async Task RunAsync(CancellationToken ct = default)

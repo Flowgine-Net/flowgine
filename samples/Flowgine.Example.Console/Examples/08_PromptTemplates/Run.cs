@@ -1,11 +1,11 @@
 using Flowgine.Core;
 using Flowgine.Example.Console.Shared;
 
-namespace Flowgine.Example.Console.Examples._10_PromptTemplates;
+namespace Flowgine.Example.Console.Examples._08_PromptTemplates;
 
 public sealed class Run : IExample
 {
-    public string Id => "10-prompt-templates";
+    public string Id => "08-prompt-templates";
     public string Title => "Prompt Templates - Reusable Prompt Construction";
 
     public async Task RunAsync(CancellationToken ct = default)

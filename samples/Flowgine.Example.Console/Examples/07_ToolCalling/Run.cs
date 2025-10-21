@@ -2,11 +2,11 @@ using Flowgine.Example.Console.Shared;
 using Flowgine.Core;
 using Flowgine.LLM.Abstractions;
 
-namespace Flowgine.Example.Console.Examples._09_ToolCalling;
+namespace Flowgine.Example.Console.Examples._07_ToolCalling;
 
 public sealed class Run : IExample
 {
-    public string Id => "09-tool-calling";
+    public string Id => "07-tool-calling";
     public string Title => "Tool Calling - AI Assistant with Weather, Time & Calculator";
 
     public async Task RunAsync(CancellationToken ct = default)
