@@ -110,18 +110,15 @@ public sealed class AssistantNode : AsyncNode<AgentState>
             // Execute each tool call
             foreach (var toolCall in completion.ToolCalls)
             {
-                System.Console.WriteLine($"   • {toolCall.Name}");
+                System.Console.WriteLine($"   • {toolCall.Name} (ID: {toolCall.Id})");
                 
                 // Execute the tool
                 var toolResult = ExecuteTool(toolCall.Name, toolCall.ArgumentsJson);
                 
                 System.Console.WriteLine($"     → Result: {toolResult}");
                 
-                // Add tool result as a message
-                // Note: In a real implementation, you'd want a proper ToolMessage type
-                // For now, we'll add it as a system message
-                updatedMessages.Add(ChatMessage.System(
-                    $"Tool '{toolCall.Name}' returned: {toolResult}"));
+                // Add tool result as a proper Tool message with toolCallId
+                updatedMessages.Add(ChatMessage.Tool(toolResult, toolCall.Id));
             }
             
             // Call LLM again with tool results to get final answer
