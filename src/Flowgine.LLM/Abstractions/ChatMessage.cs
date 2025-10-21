@@ -38,6 +38,14 @@ public abstract record ChatContent;
 public sealed record TextContent(string Text) : ChatContent;
 
 /// <summary>
+/// Represents the result of a tool/function call.
+/// Used in tool messages to provide execution results back to the model.
+/// </summary>
+/// <param name="Content">The tool execution result content.</param>
+/// <param name="ToolCallId">Optional identifier linking this result to a specific tool call.</param>
+public sealed record ToolResultContent(string Content, string? ToolCallId = null) : ChatContent;
+
+/// <summary>
 /// Represents a single message in a chat conversation.
 /// A message can contain multiple content parts in a specific order.
 /// </summary>
@@ -65,5 +73,15 @@ public sealed record ChatMessage(ChatRole Role, IReadOnlyList<ChatContent> Parts
     /// <param name="t">The assistant message text.</param>
     /// <returns>A new assistant message.</returns>
     public static ChatMessage Assistant(string t)=> new(ChatRole.Assistant, [new TextContent(t)]);
+    
+    /// <summary>
+    /// Creates a tool message with the result of a tool/function call.
+    /// Used to provide tool execution results back to the model.
+    /// </summary>
+    /// <param name="result">The result from the tool execution.</param>
+    /// <param name="toolCallId">Optional identifier linking this result to a specific tool call.</param>
+    /// <returns>A new tool message.</returns>
+    public static ChatMessage Tool(string result, string? toolCallId = null) 
+        => new(ChatRole.Tool, [new ToolResultContent(result, toolCallId)]);
 }
 

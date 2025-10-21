@@ -235,14 +235,36 @@ public sealed class OpenAIChatModel : IChatModel
     {
         foreach (var m in msgs)
         {
-            var text = string.Join("", m.Parts.OfType<TextContent>().Select(p => p.Text));
-            yield return m.Role switch
+            if (m.Role == ChatRole.Tool)
             {
-                ChatRole.System    => ChatMessage.CreateSystemMessage(text),
-                ChatRole.User      => ChatMessage.CreateUserMessage(text),
-                ChatRole.Assistant => ChatMessage.CreateAssistantMessage(text),
-                _ => ChatMessage.CreateUserMessage(text),
-            };
+                // Handle tool messages specially
+                foreach (var part in m.Parts)
+                {
+                    if (part is ToolResultContent toolResult)
+                    {
+                        // OpenAI requires tool_call_id for tool messages
+                        var toolCallId = toolResult.ToolCallId ?? "unknown";
+                        yield return ChatMessage.CreateToolMessage(toolCallId, toolResult.Content);
+                    }
+                    else if (part is TextContent textContent)
+                    {
+                        // Fallback for simple text tool results without ID
+                        yield return ChatMessage.CreateToolMessage("unknown", textContent.Text);
+                    }
+                }
+            }
+            else
+            {
+                // Handle regular messages
+                var text = string.Join("", m.Parts.OfType<TextContent>().Select(p => p.Text));
+                yield return m.Role switch
+                {
+                    ChatRole.System    => ChatMessage.CreateSystemMessage(text),
+                    ChatRole.User      => ChatMessage.CreateUserMessage(text),
+                    ChatRole.Assistant => ChatMessage.CreateAssistantMessage(text),
+                    _ => ChatMessage.CreateUserMessage(text),
+                };
+            }
         }
     }
     
