@@ -4,18 +4,24 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     
-    <!-- NuGet Package Properties -->
+    <!-- Package Information -->
     <PackageId>Flowgine</PackageId>
-    <Version>1.0.0</Version>
-    <Authors>Martin Golan</Authors>
-    <Description>A flow-based workflow engine for .NET with support for agentic AI patterns</Description>
-    <PackageTags>workflow;flow;engine;agentic;ai;agents;state-machine</PackageTags>
+    <Version>0.1.0</Version>
+    <Authors>Flowgine.Net</Authors>
+    <Company>Flowgine.Net</Company>
+    <Description>A flow-based workflow engine for .NET with support for agentic AI patterns. Build complex agent workflows with nodes, state management, and graph-based execution.</Description>
+    <PackageTags>workflow;flow;engine;agentic;ai;agents;state-machine;graph;langgraph</PackageTags>
+    <PackageProjectUrl>https://github.com/Flowgine-Net/flowgine</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Flowgine-Net/flowgine</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/martingolan/flowgine</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/martingolan/flowgine</PackageProjectUrl>
+    <Copyright>Copyright (c) 2025 Flowgine.Net</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    
+    <!-- Build Settings -->
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

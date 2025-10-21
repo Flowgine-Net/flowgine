@@ -43,8 +43,29 @@ public sealed class OpenAIProvider : IOpenAIProvider
             throw new InvalidOperationException("OpenAI API key is required.");
         }
         
-        // Use a single root client and derive per-model ChatClient instances from it.
-        _rootClient = new OpenAIClient(_options.ApiKey);
+        // Create API key credential
+        var credential = new System.ClientModel.ApiKeyCredential(_options.ApiKey);
+        
+        // Validate BaseUrl if provided and create client with custom endpoint
+        if (!string.IsNullOrWhiteSpace(_options.BaseUrl))
+        {
+            if (!Uri.TryCreate(_options.BaseUrl, UriKind.Absolute, out var baseUri))
+            {
+                throw new InvalidOperationException($"Invalid BaseUrl provided: '{_options.BaseUrl}'. Must be a valid absolute URI.");
+            }
+            
+            // Create client with custom endpoint (e.g., Azure OpenAI, proxy, or local LLM server)
+            var clientOptions = new OpenAIClientOptions
+            {
+                Endpoint = baseUri
+            };
+            _rootClient = new OpenAIClient(credential, clientOptions);
+        }
+        else
+        {
+            // Use default OpenAI endpoint
+            _rootClient = new OpenAIClient(credential);
+        }
     }
     
     /// <summary>

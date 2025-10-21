@@ -12,10 +12,42 @@ var config = new ConfigurationBuilder()
     .AddEnvironmentVariables()  // Can load OPENAI__APIKEY from env variables
     .Build();
 
+// Three ways to register OpenAI services:
+
+// Option 1: Using configuration from appsettings.json
 var services = new ServiceCollection()
-    .Configure<OpenAIChatOptions>(config.GetSection("OpenAI"))
-    .AddSingleton<IOpenAIProvider, OpenAIProvider>()
+    .AddOpenAI(config.GetSection("OpenAI"))
     .BuildServiceProvider();
+
+// Option 2: Direct configuration with lambda
+// var services = new ServiceCollection()
+//     .AddOpenAI(options =>
+//     {
+//         options.ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? "your-api-key";
+//         options.DefaultModel = "gpt-4o-mini";
+//         options.DefaultTemperature = 0.7f;
+//     })
+//     .BuildServiceProvider();
+
+// Option 3: Fluent configuration builder
+// var services = new ServiceCollection()
+//     .AddOpenAI(cfg => cfg
+//         .UseApiKey(Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? "your-api-key")
+//         .UseModel("gpt-4o-mini")
+//         .UseTemperature(0.7f))
+//     .BuildServiceProvider();
+
+// Azure OpenAI example:
+// var services = new ServiceCollection()
+//     .AddOpenAI(cfg => cfg
+//         .UseAzureOpenAI("your-resource-name", "your-api-key", "gpt-4"))
+//     .BuildServiceProvider();
+
+// Local LLM example (Ollama):
+// var services = new ServiceCollection()
+//     .AddOpenAI(cfg => cfg
+//         .UseLocalLLM("http://localhost:11434/v1", "llama2"))
+//     .BuildServiceProvider();
 
 Program.Services = services;
 
@@ -28,6 +60,7 @@ var examples = new IExample[]
     new Flowgine.Example.Console.Examples._04_SimpleBot.Run(),
     new Flowgine.Example.Console.Examples._05_ReflectionAgent.Run(),
     new Flowgine.Example.Console.Examples._08_StreamingBot.Run(),
+    new Flowgine.Example.Console.Examples._09_ToolCalling.Run(),
 };
 
 var map = examples.ToDictionary(e => e.Id, e => e, StringComparer.OrdinalIgnoreCase);
