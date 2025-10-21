@@ -55,13 +55,7 @@ public sealed class Run : IExample
             await Task.Delay(1000, ct);
         }
         
-        System.Console.WriteLine("\n" + new string('=', 80));
         System.Console.WriteLine("✅ Tool calling demonstration completed!");
-        System.Console.WriteLine("\nKey takeaways:");
-        System.Console.WriteLine("  • LLM automatically decides when to use tools");
-        System.Console.WriteLine("  • Tools are called with structured parameters");
-        System.Console.WriteLine("  • Results are sent back to LLM for final response");
-        System.Console.WriteLine("  • The flow is fully type-safe with ToolConfiguration");
     }
 }
 

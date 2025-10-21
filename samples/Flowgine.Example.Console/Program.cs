@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
 using Flowgine.Example.Console.Shared;
-using Flowgine.LLM.Abstractions;
 using Flowgine.LLM.OpenAI;
 
 // Load configurations (JSON + environment variables)
@@ -66,7 +65,7 @@ var examples = new IExample[]
 
 var map = examples.ToDictionary(e => e.Id, e => e, StringComparer.OrdinalIgnoreCase);
 
-var exId = Cli.GetArg(args, "--example") ?? "09-tool-calling";
+var exId = Cli.GetArg(args, "--example") ?? "05-reflection-agent";
 
 if (!map.TryGetValue(exId, out var example))
 {

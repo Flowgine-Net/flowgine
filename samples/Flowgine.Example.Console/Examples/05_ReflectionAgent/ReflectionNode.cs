@@ -23,8 +23,12 @@ public class ReflectionNode : AsyncNode<AgentState>
         var completion = await llm.GenerateAsync(req, ct);
         var text = (completion.Message.Parts[0] as TextContent)?.Text ?? "";
         
-        state.Messages.Add(ChatMessage.User(text));
+        var updatedMessages = new List<ChatMessage>(state.Messages)
+        {
+            ChatMessage.User(text)
+        };
+        
         return Update.Of<AgentState>()
-            .Set(s => s.Messages, state.Messages);
+            .Set(s => s.Messages, updatedMessages);
     }
 }
