@@ -61,6 +61,7 @@ var examples = new IExample[]
     new Flowgine.Example.Console.Examples._05_ReflectionAgent.Run(),
     new Flowgine.Example.Console.Examples._08_StreamingBot.Run(),
     new Flowgine.Example.Console.Examples._09_ToolCalling.Run(),
+    new Flowgine.Example.Console.Examples._10_PromptTemplates.Run(),
 };
 
 var map = examples.ToDictionary(e => e.Id, e => e, StringComparer.OrdinalIgnoreCase);
