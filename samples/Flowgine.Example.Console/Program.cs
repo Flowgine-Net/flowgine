@@ -66,7 +66,7 @@ var examples = new IExample[]
 
 var map = examples.ToDictionary(e => e.Id, e => e, StringComparer.OrdinalIgnoreCase);
 
-var exId = Cli.GetArg(args, "--example") ?? "05-reflection-agent";
+var exId = Cli.GetArg(args, "--example") ?? "09-tool-calling";
 
 if (!map.TryGetValue(exId, out var example))
 {

@@ -1,5 +1,3 @@
-using Flowgine.LLM.Abstractions;
-
 namespace Flowgine.Example.Console.Examples._10_PromptTemplates;
 
 public sealed record AgentState

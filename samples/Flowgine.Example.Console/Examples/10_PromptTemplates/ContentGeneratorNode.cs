@@ -13,7 +13,8 @@ public sealed class ContentGeneratorNode : AsyncNode<AgentState>
     public override async ValueTask<object?> InvokeAsync(
         AgentState state, Runtime runtime, CancellationToken ct = default)
     {
-        var chatModel = runtime.Get<IChatModel>();
+        var openAIProvider = runtime.Get<IOpenAIProvider>();
+        var chatModel = openAIProvider.GetModel();
         
         // Format the prompt using the template
         var prompt = _promptTemplate.Format(new 
@@ -27,8 +28,7 @@ public sealed class ContentGeneratorNode : AsyncNode<AgentState>
         // Create request with formatted prompt
         var request = new ChatRequest(
             Messages: [ChatMessage.User(prompt)],
-            Temperature: 0.7f,
-            MaxTokens: 200
+            MaxTokens: 2000
         );
         
         var response = await chatModel.GenerateAsync(request, ct);

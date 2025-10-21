@@ -88,7 +88,6 @@ public sealed class AssistantNode : AsyncNode<AgentState>
         // Create request with tools
         var request = new ChatRequest(
             Messages: state.Messages,
-            Temperature: 0.7f,
             Tools: tools
         );
         
@@ -129,8 +128,7 @@ public sealed class AssistantNode : AsyncNode<AgentState>
             System.Console.WriteLine("\n🤖 Assistant is formulating response with tool results...");
             
             var finalRequest = new ChatRequest(
-                Messages: updatedMessages,
-                Temperature: 0.7f
+                Messages: updatedMessages
             );
             
             var finalCompletion = await llm.GenerateAsync(finalRequest, ct);
