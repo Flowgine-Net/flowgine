@@ -1,7 +1,7 @@
 using Flowgine.Abstractions;
 using Flowgine.LLM.Abstractions;
 
-namespace Flowgine.Example.Console.Examples._08_StreamingBot;
+namespace Flowgine.Example.Console.Examples._06_StreamingBot;
 
 /// <summary>
 /// Node that demonstrates streaming LLM responses token-by-token

@@ -1,7 +1,7 @@
 using Flowgine.Abstractions;
 using Flowgine.LLM.Abstractions;
 
-namespace Flowgine.Example.Console.Examples._10_PromptTemplates;
+namespace Flowgine.Example.Console.Examples._08_PromptTemplates;
 
 public sealed class ContentGeneratorNode : AsyncNode<AgentState>
 {

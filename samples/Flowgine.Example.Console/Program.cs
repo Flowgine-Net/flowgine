@@ -58,9 +58,9 @@ var examples = new IExample[]
     new Flowgine.Example.Console.Examples._03_LoopingFlow.Run(),
     new Flowgine.Example.Console.Examples._04_SimpleBot.Run(),
     new Flowgine.Example.Console.Examples._05_ReflectionAgent.Run(),
-    new Flowgine.Example.Console.Examples._08_StreamingBot.Run(),
-    new Flowgine.Example.Console.Examples._09_ToolCalling.Run(),
-    new Flowgine.Example.Console.Examples._10_PromptTemplates.Run(),
+    new Flowgine.Example.Console.Examples._06_StreamingBot.Run(),
+    new Flowgine.Example.Console.Examples._07_ToolCalling.Run(),
+    new Flowgine.Example.Console.Examples._08_PromptTemplates.Run(),
 };
 
 var map = examples.ToDictionary(e => e.Id, e => e, StringComparer.OrdinalIgnoreCase);

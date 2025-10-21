@@ -2,7 +2,7 @@ using System.Text.Json;
 using Flowgine.Abstractions;
 using Flowgine.LLM.Abstractions;
 
-namespace Flowgine.Example.Console.Examples._09_ToolCalling;
+namespace Flowgine.Example.Console.Examples._07_ToolCalling;
 
 /// <summary>
 /// Assistant node that uses tool calling to answer questions

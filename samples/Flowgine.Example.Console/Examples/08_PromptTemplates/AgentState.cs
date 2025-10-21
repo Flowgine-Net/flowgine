@@ -1,4 +1,4 @@
-namespace Flowgine.Example.Console.Examples._10_PromptTemplates;
+namespace Flowgine.Example.Console.Examples._08_PromptTemplates;
 
 public sealed record AgentState
 {

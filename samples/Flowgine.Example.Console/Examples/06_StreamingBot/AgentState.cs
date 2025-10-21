@@ -1,6 +1,6 @@
 using Flowgine.LLM.Abstractions;
 
-namespace Flowgine.Example.Console.Examples._08_StreamingBot;
+namespace Flowgine.Example.Console.Examples._06_StreamingBot;
 
 /// <summary>
 /// State for streaming bot example

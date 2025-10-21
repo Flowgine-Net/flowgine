@@ -1,6 +1,6 @@
 using Flowgine.LLM.Abstractions;
 
-namespace Flowgine.Example.Console.Examples._09_ToolCalling;
+namespace Flowgine.Example.Console.Examples._07_ToolCalling;
 
 /// <summary>
 /// Demonstrates the new type-safe Tools API
