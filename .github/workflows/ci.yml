@@ -1,0 +1,37 @@
+name: CI Build
+
+on:
+  push:
+    branches: [ main, develop, feat/* ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Restore dependencies
+      run: dotnet restore
+    
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+    
+    - name: Test
+      run: dotnet test --configuration Release --no-build --verbosity normal
+    
+    - name: Check for warnings in core projects
+      run: |
+        echo "Building core projects and checking for warnings..."
+        dotnet build src/Flowgine/Flowgine.csproj -c Release --no-restore /warnaserror
+        dotnet build src/Flowgine.LLM/Flowgine.LLM.csproj -c Release --no-restore /warnaserror
+        dotnet build src/Flowgine.LLM.OpenAI/Flowgine.LLM.OpenAI.csproj -c Release --no-restore /warnaserror
+

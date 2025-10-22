@@ -1,0 +1,89 @@
+name: Publish to NuGet
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Triggers on version tags like v0.1.0, v1.2.3
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Get all history for changelog
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Extract version from tag
+      id: get_version
+      run: |
+        TAG=${GITHUB_REF#refs/tags/v}
+        echo "VERSION=$TAG" >> $GITHUB_OUTPUT
+        echo "Publishing version: $TAG"
+    
+    - name: Restore dependencies
+      run: dotnet restore
+    
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+    
+    - name: Run tests
+      run: dotnet test --configuration Release --no-build --verbosity normal
+    
+    - name: Pack NuGet packages
+      run: |
+        dotnet pack src/Flowgine/Flowgine.csproj \
+          -c Release \
+          -o ./nupkgs \
+          -p:PackageVersion=${{ steps.get_version.outputs.VERSION }} \
+          --no-build
+        
+        dotnet pack src/Flowgine.LLM/Flowgine.LLM.csproj \
+          -c Release \
+          -o ./nupkgs \
+          -p:PackageVersion=${{ steps.get_version.outputs.VERSION }} \
+          --no-build
+        
+        dotnet pack src/Flowgine.LLM.OpenAI/Flowgine.LLM.OpenAI.csproj \
+          -c Release \
+          -o ./nupkgs \
+          -p:PackageVersion=${{ steps.get_version.outputs.VERSION }} \
+          --no-build
+    
+    - name: List generated packages
+      run: ls -lh ./nupkgs/
+    
+    - name: Push to NuGet.org
+      run: |
+        dotnet nuget push ./nupkgs/*.nupkg \
+          --api-key ${{ secrets.NUGET_API_KEY }} \
+          --source https://api.nuget.org/v3/index.json \
+          --skip-duplicate
+      env:
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+    
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ./nupkgs/*.nupkg
+        generate_release_notes: true
+        draft: false
+        prerelease: ${{ contains(steps.get_version.outputs.VERSION, '-') }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Notify success
+      if: success()
+      run: |
+        echo "✅ Successfully published Flowgine v${{ steps.get_version.outputs.VERSION }} to NuGet.org"
+        echo "📦 Packages:"
+        echo "  - Flowgine.${{ steps.get_version.outputs.VERSION }}.nupkg"
+        echo "  - Flowgine.LLM.${{ steps.get_version.outputs.VERSION }}.nupkg"
+        echo "  - Flowgine.LLM.OpenAI.${{ steps.get_version.outputs.VERSION }}.nupkg"
+

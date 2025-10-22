@@ -1,0 +1,73 @@
+name: Publish Preview to NuGet
+
+# For publishing pre-release versions (beta, alpha, rc)
+on:
+  push:
+    tags:
+      - 'v*.*.*-*'  # Triggers on pre-release tags like v0.1.0-beta1, v1.0.0-rc1
+
+jobs:
+  publish-preview:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Extract version from tag
+      id: get_version
+      run: |
+        TAG=${GITHUB_REF#refs/tags/v}
+        echo "VERSION=$TAG" >> $GITHUB_OUTPUT
+        echo "Publishing preview version: $TAG"
+    
+    - name: Restore dependencies
+      run: dotnet restore
+    
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+    
+    - name: Pack preview packages
+      run: |
+        dotnet pack src/Flowgine/Flowgine.csproj \
+          -c Release \
+          -o ./nupkgs \
+          -p:PackageVersion=${{ steps.get_version.outputs.VERSION }} \
+          --no-build
+        
+        dotnet pack src/Flowgine.LLM/Flowgine.LLM.csproj \
+          -c Release \
+          -o ./nupkgs \
+          -p:PackageVersion=${{ steps.get_version.outputs.VERSION }} \
+          --no-build
+        
+        dotnet pack src/Flowgine.LLM.OpenAI/Flowgine.LLM.OpenAI.csproj \
+          -c Release \
+          -o ./nupkgs \
+          -p:PackageVersion=${{ steps.get_version.outputs.VERSION }} \
+          --no-build
+    
+    - name: Push preview to NuGet.org
+      run: |
+        dotnet nuget push ./nupkgs/*.nupkg \
+          --api-key ${{ secrets.NUGET_API_KEY }} \
+          --source https://api.nuget.org/v3/index.json \
+          --skip-duplicate
+      env:
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+    
+    - name: Create pre-release on GitHub
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ./nupkgs/*.nupkg
+        generate_release_notes: true
+        draft: false
+        prerelease: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

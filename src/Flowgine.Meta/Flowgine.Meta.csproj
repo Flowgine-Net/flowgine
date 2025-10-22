@@ -1,18 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
+        
+        <!-- Package Information -->
         <PackageId>Flowgine.Meta</PackageId>
-        <Version>0.0.1</Version>
-        <Authors>Flowgine Team</Authors>
-        <PackageDescription>Meta package reserving the Flowgine.* prefix. See https://github.com/Flowgine/flowgine</PackageDescription>
-        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-        <RepositoryUrl>https://github.com/Flowgine/flowgine</RepositoryUrl>
-        <PackageProjectUrl>https://github.com/Flowgine/flowgine</PackageProjectUrl>
+        <Version>0.1.0</Version>
+        <Authors>Flowgine.Net</Authors>
+        <Company>Flowgine.Net</Company>
+        <Description>Meta package reserving the Flowgine.* namespace prefix on NuGet. See https://github.com/Flowgine-Net/flowgine</Description>
+        <PackageTags>meta;placeholder;namespace</PackageTags>
+        <PackageProjectUrl>https://github.com/Flowgine-Net/flowgine</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/Flowgine-Net/flowgine</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Copyright>Copyright (c) 2025 Flowgine.Net</Copyright>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        
+        <!-- Build Settings -->
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
+    
     <ItemGroup>
         <None Include="README.md" Pack="true" PackagePath="" />
     </ItemGroup>

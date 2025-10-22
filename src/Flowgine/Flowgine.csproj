@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    
+    <!-- Package Information -->
+    <PackageId>Flowgine</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Flowgine.Net</Authors>
+    <Company>Flowgine.Net</Company>
+    <Description>A flow-based workflow engine for .NET with support for agentic AI patterns. Build complex agent workflows with nodes, state management, and graph-based execution.</Description>
+    <PackageTags>workflow;flow;engine;agentic;ai;agents;state-machine;graph;langgraph</PackageTags>
+    <PackageProjectUrl>https://github.com/Flowgine-Net/flowgine</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Flowgine-Net/flowgine</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>Copyright (c) 2025 Flowgine.Net</Copyright>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    
+    <!-- Build Settings -->
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.9" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>
+
