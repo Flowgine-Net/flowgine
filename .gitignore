@@ -35,6 +35,8 @@ ScaffoldingReadMe.txt
 *.nupkg
 # NuGet Symbol Packages
 *.snupkg
+# NuGet package output directory
+nupkgs/
 
 # Others
 ~$*
@@ -65,3 +67,9 @@ nunit-*.xml
 
 # Development
 appsettings.Development.json
+.env
+.env.local
+*.local.json
+
+# API Keys and Secrets
+nuget.config.user
