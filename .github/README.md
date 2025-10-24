@@ -1,76 +1,76 @@
 # GitHub Actions Setup
 
-Tento adresář obsahuje CI/CD workflows pro Flowgine.
+This directory contains CI/CD workflows for Flowgine.
 
 ## Workflows
 
 ### 1. `ci.yml` - Continuous Integration
-**Trigger:** Push na main/develop/feat branches, Pull Requests
+**Trigger:** Push to main/develop/feat branches, Pull Requests
 
-**Akce:**
-- ✅ Build projektu v Release módu
-- ✅ Spuštění testů
-- ✅ Kontrola warningů v core projektech
+**Actions:**
+- ✅ Build project in Release mode
+- ✅ Run tests
+- ✅ Check warnings in core projects
 
 ### 2. `publish.yml` - Publish to NuGet
-**Trigger:** Push tagu ve formátu `v*.*.*` (např. `v0.1.0`, `v1.2.3`)
+**Trigger:** Push tag in format `v*.*.*` (e.g. `v0.1.0`, `v1.2.3`)
 
-**Akce:**
-- ✅ Build a test
-- ✅ Vytvoření NuGet balíčků
-- ✅ Publikace na NuGet.org
-- ✅ Vytvoření GitHub Release
+**Actions:**
+- ✅ Build and test
+- ✅ Create NuGet packages
+- ✅ Publish to NuGet.org
+- ✅ Create GitHub Release
 
 ### 3. `preview-publish.yml` - Publish Preview
-**Trigger:** Push pre-release tagu `v*.*.*-*` (např. `v0.1.0-beta1`, `v1.0.0-rc1`)
+**Trigger:** Push pre-release tag `v*.*.*-*` (e.g. `v0.1.0-beta1`, `v1.0.0-rc1`)
 
-**Akce:**
-- ✅ Vytvoření a publikace pre-release balíčků
-- ✅ Vytvoření pre-release na GitHubu
+**Actions:**
+- ✅ Create and publish pre-release packages
+- ✅ Create pre-release on GitHub
 
-## První nastavení
+## Initial Setup
 
-### 1. Nastavení NuGet API klíče
+### 1. Configure NuGet API Key
 
-1. Získej API klíč z https://www.nuget.org/account/apikeys
-2. Přidej jako GitHub Secret:
-   - Přejdi na: `Settings → Secrets and variables → Actions`
-   - Klikni **"New repository secret"**
+1. Get API key from https://www.nuget.org/account/apikeys
+2. Add as GitHub Secret:
+   - Go to: `Settings → Secrets and variables → Actions`
+   - Click **"New repository secret"**
    - **Name**: `NUGET_API_KEY`
-   - **Value**: `tvůj-api-klíč-z-nuget.org`
-   - Klikni **"Add secret"**
+   - **Value**: `your-api-key-from-nuget.org`
+   - Click **"Add secret"**
 
-### 2. Permissions pro GitHub Actions
+### 2. Permissions for GitHub Actions
 
-Workflows potřebují oprávnění pro vytváření releases:
+Workflows need permissions to create releases:
 
-1. Přejdi na: `Settings → Actions → General`
-2. Sekce **"Workflow permissions"**
-3. Vyber **"Read and write permissions"**
-4. Zaškrtni **"Allow GitHub Actions to create and approve pull requests"**
-5. Klikni **"Save"**
+1. Go to: `Settings → Actions → General`
+2. Section **"Workflow permissions"**
+3. Select **"Read and write permissions"**
+4. Check **"Allow GitHub Actions to create and approve pull requests"**
+5. Click **"Save"**
 
-## Jak publikovat novou verzi
+## How to Publish a New Version
 
-### Automaticky (doporučeno)
+### Automatically (recommended)
 
 ```bash
-# Použij helper script
+# Use helper script
 ./scripts/create-release.sh 0.1.0
 
-# Push změn a tagu
+# Push changes and tag
 git push origin main --tags
 ```
 
-GitHub Actions se automaticky spustí a publikuje balíčky!
+GitHub Actions will automatically run and publish the packages!
 
-### Ručně
+### Manually
 
 ```bash
-# 1. Aktualizuj verzi v .csproj souborech
+# 1. Update version in .csproj files
 # <Version>0.1.0</Version> → <Version>0.2.0</Version>
 
-# 2. Commit a vytvoř tag
+# 2. Commit and create tag
 git add .
 git commit -m "chore: bump version to 0.2.0"
 git tag -a v0.2.0 -m "Release version 0.2.0"
@@ -79,58 +79,58 @@ git tag -a v0.2.0 -m "Release version 0.2.0"
 git push origin main --tags
 ```
 
-## Pre-release verze
+## Pre-release Versions
 
-Pro publikaci beta/alpha verzí:
+To publish beta/alpha versions:
 
 ```bash
-# Vytvoř pre-release tag
+# Create pre-release tag
 git tag -a v0.1.0-beta1 -m "Beta release 0.1.0-beta1"
 git push origin v0.1.0-beta1
 ```
 
-Spustí se `preview-publish.yml` workflow.
+This will trigger the `preview-publish.yml` workflow.
 
-## Sledování průběhu
+## Monitoring Progress
 
-1. Přejdi na: `Actions` tab v GitHubu
-2. Vyber workflow run
-3. Sleduj progress jednotlivých kroků
+1. Go to: `Actions` tab in GitHub
+2. Select workflow run
+3. Monitor progress of individual steps
 
 ## Troubleshooting
 
 ### "Package already exists"
-- NuGet neumožňuje přepsat existující verzi
-- Musíš použít novou verzi (např. `0.1.1`)
+- NuGet doesn't allow overwriting existing versions
+- You must use a new version (e.g. `0.1.1`)
 
 ### "Invalid API key"
-- Zkontroluj, že `NUGET_API_KEY` secret je správně nastaven
-- API klíč musí mít scope `Push new packages and package versions`
+- Check that `NUGET_API_KEY` secret is correctly configured
+- API key must have scope `Push new packages and package versions`
 
 ### "Permission denied to create release"
-- Zkontroluj workflow permissions v Settings → Actions
+- Check workflow permissions in Settings → Actions
 
-### Build failuje
-- Zkontroluj, že všechny projekty buildují lokálně: `dotnet build -c Release`
-- Zkontroluj warnings: `dotnet build --warnaserror`
+### Build fails
+- Check that all projects build locally: `dotnet build -c Release`
+- Check warnings: `dotnet build --warnaserror`
 
-## Lokální testování
+## Local Testing
 
-Před publikací otestuj lokálně:
+Before publishing, test locally:
 
 ```bash
-# Build a pack
+# Build and pack
 ./scripts/pack-local.sh
 
-# Zkontroluj vytvořené balíčky
+# Check created packages
 ls -lh ./nupkgs/
 
-# Otestuj instalaci
+# Test installation
 dotnet nuget add source $(pwd)/nupkgs --name LocalFlowgine
 dotnet add package Flowgine --source LocalFlowgine
 ```
 
-## Další informace
+## Additional Information
 
-Viz [RELEASE_CHECKLIST.md](../RELEASE_CHECKLIST.md) pro kompletní release proces.
+See [RELEASE_CHECKLIST.md](../RELEASE_CHECKLIST.md) for complete release process.
 
