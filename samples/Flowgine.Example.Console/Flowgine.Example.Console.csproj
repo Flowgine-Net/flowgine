@@ -3,6 +3,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Flowgine\Flowgine.csproj" />
     <ProjectReference Include="..\..\src\Flowgine.LLM.OpenAI\Flowgine.LLM.OpenAI.csproj" />
+    <ProjectReference Include="..\..\src\Flowgine.Observability\Flowgine.Observability.csproj" />
+    <ProjectReference Include="..\..\src\Flowgine.Observability.Langfuse\Flowgine.Observability.Langfuse.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -16,6 +18,9 @@
 
   <ItemGroup>
     <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="appsettings.local.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

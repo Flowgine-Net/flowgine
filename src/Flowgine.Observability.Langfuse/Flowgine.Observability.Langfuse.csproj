@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    
+    <!-- Package Information -->
+    <PackageId>Flowgine.Observability.Langfuse</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Flowgine.Net</Authors>
+    <Company>Flowgine.Net</Company>
+    <Description>Langfuse observability provider for Flowgine. Tracks LLM agent workflows in Langfuse platform using OpenTelemetry. Includes automatic tracing, token usage tracking, and cost analytics.</Description>
+    <PackageTags>langfuse;observability;tracing;llm;flowgine;agent;workflow;opentelemetry;monitoring</PackageTags>
+    <PackageProjectUrl>https://github.com/Flowgine-Net/flowgine</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Flowgine-Net/flowgine</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>Copyright (c) 2025 Flowgine.Net</Copyright>
+    
+    <!-- Build Settings -->
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Flowgine.Observability\Flowgine.Observability.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.10" />
+    <PackageReference Include="OpenTelemetry" Version="1.13.1" />
+    <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.13.1" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.13.1" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.13.1" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.13.0" />
+  </ItemGroup>
+
+</Project>
