@@ -172,9 +172,21 @@ public sealed class CompiledFlowgine<TState>
                         "Possible infinite loop detected. Consider increasing MaxIterations if this is intentional.");
                 }
                 
-                yield return new NodeStarted<TState>(next);
-                
+                // Get node instance to check for metadata
                 var node = _builder.Nodes[next];
+                
+                // Extract metadata from node if it implements IObservableNode
+                IReadOnlyDictionary<string, string>? metadata = null;
+                if (node is IObservableNode observableNode)
+                {
+                    metadata = new Dictionary<string, string>
+                    {
+                        ["observationType"] = observableNode.ObservationType
+                    };
+                }
+                
+                yield return new NodeStarted<TState>(next, metadata);
+                
                 object? result;
                 Exception? failureException = null;
                 

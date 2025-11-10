@@ -11,7 +11,11 @@ public abstract record FlowgineEvent<TState>;
 /// </summary>
 /// <typeparam name="TState">The type of state associated with the flow operation.</typeparam>
 /// <param name="NodeName">The name of the node that has started.</param>
-public sealed record NodeStarted<TState>(string NodeName) : FlowgineEvent<TState>;
+/// <param name="Metadata">Optional metadata associated with the node (e.g., observation type for tracing).</param>
+public sealed record NodeStarted<TState>(
+    string NodeName, 
+    IReadOnlyDictionary<string, string>? Metadata = null
+) : FlowgineEvent<TState>;
 
 /// <summary>
 /// Represents an event that signifies the completion of a specific node within a flow execution.

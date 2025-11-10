@@ -80,7 +80,7 @@ public sealed class OpenAIProvider : IOpenAIProvider
     {
         // Derive a lightweight ChatClient for the default model from the root client.
         var model = _rootClient.GetChatClient(_options.DefaultModel);
-        return new OpenAIChatModel(model);
+        return new OpenAIChatModel(model, _options.DefaultModel);
     }
 
     /// <summary>
@@ -99,7 +99,7 @@ public sealed class OpenAIProvider : IOpenAIProvider
             throw new ArgumentException("Model id must be provided.", nameof(model));
 
         var chatModel = _rootClient.GetChatClient(model);
-        return new OpenAIChatModel(chatModel);
+        return new OpenAIChatModel(chatModel, model);
     }
 }
 

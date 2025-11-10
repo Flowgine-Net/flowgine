@@ -3,32 +3,43 @@ using System.Runtime.CompilerServices;
 
 namespace Flowgine.Observability;
 
+/// <summary>
+/// Decorator for <see cref="IChatModel"/> that adds observability tracking to all LLM interactions.
+/// Automatically captures requests, responses, token usage, and errors.
+/// </summary>
 public sealed class ObservableChatModel : IChatModel
 {
     private readonly IChatModel _inner;
     private readonly IObservabilityProvider _provider;
-    private readonly string _modelName;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ObservableChatModel"/> class.
+    /// </summary>
+    /// <param name="inner">The underlying chat model to wrap.</param>
+    /// <param name="provider">The observability provider for tracking calls.</param>
     public ObservableChatModel(
         IChatModel inner,
-        IObservabilityProvider provider,
-        string modelName)
+        IObservabilityProvider provider)
     {
         _inner = inner;
         _provider = provider;
-        _modelName = modelName;
     }
 
+    /// <inheritdoc />
+    public string Model => _inner.Model;
+
+    /// <inheritdoc />
     public async Task<ChatCompletion> GenerateAsync(
         ChatRequest request,
         CancellationToken ct = default)
     {
-        // Get current trace context from AsyncLocal or Runtime
-        var trace = TraceContext.Current;
+        // Try to get trace context from AsyncLocal first, then from global static fallback
+        var trace = TraceContext.Current ?? TraceContext.GlobalCurrent;
+        
         if (trace == null)
             return await _inner.GenerateAsync(request, ct);
 
-        var span = await _provider.StartLLMSpanAsync(trace, _modelName, request, ct);
+        var span = await _provider.StartLLMSpanAsync(trace, _inner.Model, request, ct);
 
         try
         {
@@ -43,11 +54,12 @@ public sealed class ObservableChatModel : IChatModel
         }
     }
 
+    /// <inheritdoc />
     public async IAsyncEnumerable<ChatStreamEvent> StreamAsync(
         ChatRequest request,
         [EnumeratorCancellation] CancellationToken ct = default)
     {
-        var trace = TraceContext.Current;
+        var trace = TraceContext.Current ?? TraceContext.GlobalCurrent;
         if (trace == null)
         {
             await foreach (var ev in _inner.StreamAsync(request, ct))
@@ -55,7 +67,7 @@ public sealed class ObservableChatModel : IChatModel
             yield break;
         }
 
-        var span = await _provider.StartLLMSpanAsync(trace, _modelName, request, ct);
+        var span = await _provider.StartLLMSpanAsync(trace, _inner.Model, request, ct);
         ChatCompletion? completion = null;
         Exception? error = null;
 

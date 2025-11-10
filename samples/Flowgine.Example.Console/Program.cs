@@ -3,20 +3,54 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Flowgine.Example.Console.Shared;
 using Flowgine.LLM.OpenAI;
+using Flowgine.Observability.Langfuse;
 
 // Load configurations (JSON + environment variables)
 var config = new ConfigurationBuilder()
     .SetBasePath(AppContext.BaseDirectory)
     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables()  // Can load OPENAI__APIKEY from env variables
     .Build();
 
 // Three ways to register OpenAI services:
 
 // Option 1: Using configuration from appsettings.json
-var services = new ServiceCollection()
-    .AddOpenAI(config.GetSection("OpenAI"))
-    .BuildServiceProvider();
+var serviceCollection = new ServiceCollection()
+    .AddOpenAI(config.GetSection("OpenAI"));
+
+// Register Langfuse observability if configured
+var lf = config.GetSection("Langfuse");
+var publicKey = lf["PublicKey"] ?? Environment.GetEnvironmentVariable("LANGFUSE_PUBLIC_KEY");
+var secretKey = lf["SecretKey"] ?? Environment.GetEnvironmentVariable("LANGFUSE_SECRET_KEY");
+var host = lf["Host"] ?? Environment.GetEnvironmentVariable("LANGFUSE_HOST");
+
+if (!string.IsNullOrWhiteSpace(publicKey) && !string.IsNullOrWhiteSpace(secretKey))
+{
+    System.Console.WriteLine("🔍 Langfuse observability enabled");
+    serviceCollection.AddLangfuseObservability(
+        publicKey,
+        secretKey,
+        applicationName: "flowgine-examples",
+        langfuseHost: host,
+        configure: o => 
+        {
+            o.EnableConsoleExporter = true; // Enable for debugging
+            System.Console.WriteLine($"📊 Langfuse OTLP endpoint: {host}/api/public/otel/v1/traces");
+        });
+}
+else
+{
+    System.Console.WriteLine("ℹ️ Langfuse observability not configured (optional)");
+}
+
+var services = serviceCollection.BuildServiceProvider();
+
+// Force TracerProvider initialization if observability is enabled
+if (!string.IsNullOrWhiteSpace(publicKey) && !string.IsNullOrWhiteSpace(secretKey))
+{
+    _ = services.GetService<OpenTelemetry.Trace.TracerProvider>();
+}
 
 // Option 2: Direct configuration with lambda
 // var services = new ServiceCollection()
@@ -61,11 +95,15 @@ var examples = new IExample[]
     new Flowgine.Example.Console.Examples._06_StreamingBot.Run(),
     new Flowgine.Example.Console.Examples._07_ToolCalling.Run(),
     new Flowgine.Example.Console.Examples._08_PromptTemplates.Run(),
+    new Flowgine.Example.Console.Examples._09_Observability.Run(),
+    new Flowgine.Example.Console.Examples._10_ObservableSimpleBot.Run(),
 };
 
 var map = examples.ToDictionary(e => e.Id, e => e, StringComparer.OrdinalIgnoreCase);
 
-var exId = Cli.GetArg(args, "--example") ?? "05-reflection-agent";
+var exId = Cli.GetArg(args, "--example") ?? "10-observable-simple-bot";
+
+//var exId = Cli.GetArg(args, "--example") ?? "09-observability";
 
 if (!map.TryGetValue(exId, out var example))
 {

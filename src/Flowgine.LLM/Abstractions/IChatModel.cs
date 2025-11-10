@@ -6,6 +6,11 @@ namespace Flowgine.LLM.Abstractions;
 public interface IChatModel
 {
     /// <summary>
+    /// Gets the name of the model used in requests sent to the service.
+    /// </summary>
+    string Model { get; }
+    
+    /// <summary>
     /// Generates a complete chat response for the given request.
     /// </summary>
     /// <param name="request">The chat completion request.</param>

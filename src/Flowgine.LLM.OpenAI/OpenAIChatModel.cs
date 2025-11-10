@@ -17,15 +17,21 @@ namespace Flowgine.LLM.OpenAI;
 public sealed class OpenAIChatModel : IChatModel
 {
     private readonly ChatClient _client;
+    private readonly string _model;
     
     /// <summary>
     /// Initializes a new instance of the <see cref="OpenAIChatModel"/> class.
     /// </summary>
     /// <param name="client">The OpenAI chat client to use for API calls.</param>
-    public OpenAIChatModel(ChatClient client)
+    /// <param name="model">The name of the model to use for requests.</param>
+    public OpenAIChatModel(ChatClient client, string model)
     {
         _client = client;
+        _model = model;
     }
+    
+    /// <inheritdoc />
+    public string Model => _model;
 
     /// <inheritdoc />
     public async Task<Flowgine.LLM.Abstractions.ChatCompletion> GenerateAsync(
