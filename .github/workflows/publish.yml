@@ -55,6 +55,18 @@ jobs:
           -o ./nupkgs \
           -p:PackageVersion=${{ steps.get_version.outputs.VERSION }} \
           --no-build
+        
+        dotnet pack src/Flowgine.Observability/Flowgine.Observability.csproj \
+          -c Release \
+          -o ./nupkgs \
+          -p:PackageVersion=${{ steps.get_version.outputs.VERSION }} \
+          --no-build
+        
+        dotnet pack src/Flowgine.Observability.Langfuse/Flowgine.Observability.Langfuse.csproj \
+          -c Release \
+          -o ./nupkgs \
+          -p:PackageVersion=${{ steps.get_version.outputs.VERSION }} \
+          --no-build
     
     - name: List generated packages
       run: ls -lh ./nupkgs/
@@ -86,4 +98,6 @@ jobs:
         echo "  - Flowgine.${{ steps.get_version.outputs.VERSION }}.nupkg"
         echo "  - Flowgine.LLM.${{ steps.get_version.outputs.VERSION }}.nupkg"
         echo "  - Flowgine.LLM.OpenAI.${{ steps.get_version.outputs.VERSION }}.nupkg"
+        echo "  - Flowgine.Observability.${{ steps.get_version.outputs.VERSION }}.nupkg"
+        echo "  - Flowgine.Observability.Langfuse.${{ steps.get_version.outputs.VERSION }}.nupkg"
 

@@ -51,6 +51,18 @@ jobs:
           -o ./nupkgs \
           -p:PackageVersion=${{ steps.get_version.outputs.VERSION }} \
           --no-build
+        
+        dotnet pack src/Flowgine.Observability/Flowgine.Observability.csproj \
+          -c Release \
+          -o ./nupkgs \
+          -p:PackageVersion=${{ steps.get_version.outputs.VERSION }} \
+          --no-build
+        
+        dotnet pack src/Flowgine.Observability.Langfuse/Flowgine.Observability.Langfuse.csproj \
+          -c Release \
+          -o ./nupkgs \
+          -p:PackageVersion=${{ steps.get_version.outputs.VERSION }} \
+          --no-build
     
     - name: Push preview to NuGet.org
       run: |

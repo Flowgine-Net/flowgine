@@ -34,4 +34,6 @@ jobs:
         dotnet build src/Flowgine/Flowgine.csproj -c Release --no-restore /warnaserror
         dotnet build src/Flowgine.LLM/Flowgine.LLM.csproj -c Release --no-restore /warnaserror
         dotnet build src/Flowgine.LLM.OpenAI/Flowgine.LLM.OpenAI.csproj -c Release --no-restore /warnaserror
+        dotnet build src/Flowgine.Observability/Flowgine.Observability.csproj -c Release --no-restore /warnaserror
+        dotnet build src/Flowgine.Observability.Langfuse/Flowgine.Observability.Langfuse.csproj -c Release --no-restore /warnaserror
 
