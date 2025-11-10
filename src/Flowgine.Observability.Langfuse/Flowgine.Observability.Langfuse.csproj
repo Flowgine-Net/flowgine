@@ -7,7 +7,7 @@
     
     <!-- Package Information -->
     <PackageId>Flowgine.Observability.Langfuse</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Authors>Flowgine.Net</Authors>
     <Company>Flowgine.Net</Company>
     <Description>Langfuse observability provider for Flowgine. Tracks LLM agent workflows in Langfuse platform using OpenTelemetry. Includes automatic tracing, token usage tracking, and cost analytics.</Description>

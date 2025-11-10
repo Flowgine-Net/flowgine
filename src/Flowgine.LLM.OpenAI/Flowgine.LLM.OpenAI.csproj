@@ -7,7 +7,7 @@
     
     <!-- Package Information -->
     <PackageId>Flowgine.LLM.OpenAI</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Authors>Flowgine.Net</Authors>
     <Company>Flowgine.Net</Company>
     <Description>OpenAI provider for Flowgine.LLM. Supports chat completions, streaming, tool calling, Azure OpenAI, and local LLM endpoints. Built on OpenAI SDK 2.x.</Description>

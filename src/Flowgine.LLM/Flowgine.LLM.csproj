@@ -7,7 +7,7 @@
     
     <!-- Package Information -->
     <PackageId>Flowgine.LLM</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Authors>Flowgine.Net</Authors>
     <Company>Flowgine.Net</Company>
     <Description>LLM abstractions for Flowgine - a .NET graph workflow agent engine. Provides type-safe interfaces for chat completions, streaming, and tool calling.</Description>

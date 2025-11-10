@@ -7,7 +7,7 @@
     
     <!-- Package Information -->
     <PackageId>Flowgine</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Authors>Flowgine.Net</Authors>
     <Company>Flowgine.Net</Company>
     <Description>A flow-based workflow engine for .NET with support for agentic AI patterns. Build complex agent workflows with nodes, state management, and graph-based execution.</Description>
